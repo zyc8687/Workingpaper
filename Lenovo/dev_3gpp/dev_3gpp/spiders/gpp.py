@@ -10,10 +10,10 @@ from urllib import parse
 class GppSpider(scrapy.Spider):
     name = 'gpp'
     allowed_domains = ['www.3gpp.org']
-    start_urls = [
-            'https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_108-e/Inbox/drafts',
-                  ]
-    # start_urls = ['https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_104b-e/Inbox/drafts']
+    # start_urls = [
+    #         'https://www.3gpp.org/ftp/tsg_ran/WG3_Iu/TSGR3_116-e/Inbox/Drafts',
+    #               ]
+    start_urls = ['https://www.3gpp.org/ftp/tsg_ran/WG2_RL2/TSGR2_119bis-e/Inbox/Drafts']
 
     '''count leader'''
     # def parse(self, response):
@@ -52,55 +52,64 @@ class GppSpider(scrapy.Spider):
     ''' 统计公司名字 '''
     def parse(self, response):
         links = response.xpath('//tbody//td//a/@href').getall()
-
         for link in links:
+            # link = parse.unquote(link)
+            '''判断列表页是否为.doc结尾'''
             detail_link = re.findall('.+[\s\-\_]{1}(.+)\.[docxrazip]{3,4}',link)
-            if detail_link:
+            if detail_link[0:2]:
                 pass
             else:
-                # link = 'https://www.3gpp.org/ftp/tsg_ran/WG1_RL1/TSGR1_105-e/Inbox/drafts/5.2'
+
                 yield scrapy.Request(link, callback=self.get_document)
+        # link = 'https://www.3gpp.org/ftp/tsg_ran/WG3_Iu/TSGR3_117bis-e/Inbox/Drafts/CB%20%23%2010_R17MBS2_F1E1'
+        # yield scrapy.Request(link, callback=self.get_document)
+
+
+
+
 
     def get_document(self, response):
         item = {}
         urls = response.xpath('//tbody//tr/td/a/@href').getall()
-        _document =re.compile('https.+\.[xlsdoczfiptra]{3,4}', re.I)
-        wendang = re.compile('.+[\s\-\_]{1}(.+)\.[docxrazip]{3,4}', re.I)
+        doc_time = response.xpath('//tbody//tr/td[3]//text()').getall()
+        re_doc = re.compile('.+[\s\-\_]{1}(.+)\.[docxrazip]{3,4}', re.I)
+        re_time = re.compile('[^\d]+(\d{4}\/\d{2}\/\d{2}).*')
+        for url,time in zip(urls,doc_time):
+            # urls = parse.unquote(url)
+            # docurl = urls.replace('%', '-')
+            # docurl = docurl.replace('(', '/')
+            # docurl = docurl.replace(')', '')
+            name = re_doc.findall(url)
+            time = re_time.findall(time)
+            if len(name) > 0:
+                # '''判断是否计数文件'''
+                '''显示路径'''
+                # _document = re.compile('https.+\.[a-z]{3,15}$', re.I)
+                # doument = _document.findall(url)
+                # doument = parse.unquote(doument[0])
+                # item['paths'] = doument
 
-        for url in urls:
-            '''特殊文件处理'''
-            if '.7z' in url:
-                url = re.sub('.7z','.doc',url)
-            doument = _document.findall(url)
+                CompanyName = re.sub("\d+", '', name[0], re.I)
+                item['name'] = CompanyName
+                item['time'] = time
+                yield item
+                # print(item)
 
-            if len(doument) > 0:
-                docurl = url.replace('%', '-')
-                # print('****', url)
-                # item['url'] = docurl
-                name = wendang.findall(docurl)
-                if len(name) > 0:
-
-                    # print('docurl', docurl)
-                    # print('name', name[0])
-                    # print('='*30)
-                    CompanyName = re.sub("\d+", '', name[0], re.I)
-                    print('=====',CompanyName,'>>',docurl)
-                    # item['paths'] = doument
-                    item['name'] = CompanyName
-                    yield item
 
             else:
-                # print('文件：',url)
-                yield scrapy.Request(url, callback=self.get_document)
-                yield item
+                '''嵌套文件处理'''
+                _document = re.compile('https.+\.[a-z]{3,15}$', re.I)
+                doument = _document.findall(url)
+                if len(doument) > 0:
+                    pass
+                else:
+                    yield scrapy.Request(url, callback=self.get_document)
+                    yield item
 
 
 
 
-
-
-
-    # ''' 一次会分TOPIC '''
+    ''' 一次会分TOPIC '''
     # def parse(self, response):
     #     links = response.xpath('//tbody//td//a/@href').getall()
     #     item = {}
@@ -151,7 +160,7 @@ class GppSpider(scrapy.Spider):
     #             docurl = docurl.replace('%3D', '=')
     #             name = wendang.findall(docurl)
     #             docl = name[0]
-    #             company_list = re.findall('.+[^a-zA-Z0-9]{1}(.+)\.[xlsdoczipraft]{3,4}', docl, re.I)
+    #             company_list = re.findall('.+[^a-zA-Z0-9]{1}(.+)\.[xlsdocziepraft]{3,4}', docl, re.I)
     #
     #             item['path']=docl
     #             item['name'] = company_list[0]

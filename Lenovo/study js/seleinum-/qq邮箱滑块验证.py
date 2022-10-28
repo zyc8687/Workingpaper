@@ -73,6 +73,7 @@ def Count_Sliding(driver,img1,img2):
     # WebDriverWait(driver, 5).until(ec.element_to_be_clickable((By.ID, 'switcher_plogin')))
     driver.find_element_by_id('switcher_plogin').click()
 
+
     sleep(0.3)
     driver.find_element_by_id('u').send_keys('1239965374')
     sleep(0.9)

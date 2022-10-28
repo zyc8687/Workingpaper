@@ -10,6 +10,7 @@ class WealthItem(scrapy.Item):
     name = scrapy.Field()
     price = scrapy.Field()
     code = scrapy.Field()
+    todays = scrapy.Field()
     price_limit = scrapy.Field()
     trading_turnover = scrapy.Field()
     trading_volume = scrapy.Field()
@@ -23,4 +24,5 @@ class WealthItem(scrapy.Item):
     PB = scrapy.Field()
     plate = scrapy.Field()
     list_key = scrapy.Field()
+    md5 = scrapy.Field()
 
