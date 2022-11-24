@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 
-web = Chrome()
+web = Chrome(r"C:\Users\BZ\Downloads\chromedriver_win32\chromedriver.exe")
 
 web.get('https://www.lagou.com/')
 

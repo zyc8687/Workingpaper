@@ -13,7 +13,8 @@ class GppSpider(scrapy.Spider):
     # start_urls = [
     #         'https://www.3gpp.org/ftp/tsg_ran/WG3_Iu/TSGR3_116-e/Inbox/Drafts',
     #               ]
-    start_urls = ['https://www.3gpp.org/ftp/tsg_ran/WG2_RL2/TSGR2_119bis-e/Inbox/Drafts']
+    start_urls = ['https://www.3gpp.org/ftp/Meetings_3GPP_SYNC/RAN3/Inbox/drafts']
+    # start_urls = ['https:toulouse2022.3gpp.org/RAN/RAN2/Inbox/Drafts']
 
     '''count leader'''
     # def parse(self, response):
@@ -72,15 +73,13 @@ class GppSpider(scrapy.Spider):
         item = {}
         urls = response.xpath('//tbody//tr/td/a/@href').getall()
         doc_time = response.xpath('//tbody//tr/td[3]//text()').getall()
-        re_doc = re.compile('.+[\s\-\_]{1}(.+)\.[docxrazip]{3,4}', re.I)
-        re_time = re.compile('[^\d]+(\d{4}\/\d{2}\/\d{2}).*')
+        re_doc = re.compile('.+[(\s\-\_]{1}(.+)\.[docxrazip]{3,4}', re.I)
         for url,time in zip(urls,doc_time):
             # urls = parse.unquote(url)
             # docurl = urls.replace('%', '-')
             # docurl = docurl.replace('(', '/')
             # docurl = docurl.replace(')', '')
             name = re_doc.findall(url)
-            time = re_time.findall(time)
             if len(name) > 0:
                 # '''判断是否计数文件'''
                 '''显示路径'''
@@ -91,7 +90,6 @@ class GppSpider(scrapy.Spider):
 
                 CompanyName = re.sub("\d+", '', name[0], re.I)
                 item['name'] = CompanyName
-                item['time'] = time
                 yield item
                 # print(item)
 
@@ -109,7 +107,7 @@ class GppSpider(scrapy.Spider):
 
 
 
-    ''' 一次会分TOPIC '''
+    # ''' 一次会分TOPIC '''
     # def parse(self, response):
     #     links = response.xpath('//tbody//td//a/@href').getall()
     #     item = {}
@@ -121,7 +119,7 @@ class GppSpider(scrapy.Spider):
     #         docurl = docurl.replace('%5D', ']')
     #         docurl = docurl.replace('%23', '#')
     #         docurl = docurl.replace('%26', '&')
-    #         docurl = docurl.replace('%2C', ',')
+    #         docurl = docurl.replace('%2C', ','
     #         docurl = docurl.replace('%24', '$')
     #         docurl = docurl.replace('%3D', '=')
     #         # catalog = re.sub('\s.+','',docurl)
@@ -143,11 +141,8 @@ class GppSpider(scrapy.Spider):
     #
     #
     #     wendang = re.compile('\/[^\/]+\.[xlsdoczipraft]{3,4}', re.I)
-    #     # wendang = re.compile('.+[\s\-\_]{1}(.+)\.[docxzip]{3,4}', re.I)
     #     for url in urls:
-    #
     #         doument = _document.findall(url)
-    #
     #         if len(doument) > 0:
     #             docurl = url.replace('%20', ' ')
     #             docurl = docurl.replace('%5B', '[')
@@ -162,7 +157,7 @@ class GppSpider(scrapy.Spider):
     #             docl = name[0]
     #             company_list = re.findall('.+[^a-zA-Z0-9]{1}(.+)\.[xlsdocziepraft]{3,4}', docl, re.I)
     #
-    #             item['path']=docl
+    #             # item['path']=docl
     #             item['name'] = company_list[0]
     #             # print('=====',docl,company_list[0])
     #             # print('=====',url)
